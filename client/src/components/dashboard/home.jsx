@@ -1,6 +1,10 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Upload, Clock, Star, Plus } from "lucide-react"
+import { ServerContext } from "../../context/ServerContext";
+
 export default function Dashboard() {
+    const { account } = useContext(ServerContext);
+
     const [recentChats] = useState([
         { id: 1, title: "Biology Chapter 5 - Photosynthesis", date: "Today", questions: 12 },
         { id: 2, title: "Physics Mechanics Problems", date: "Yesterday", questions: 8 },
@@ -18,7 +22,7 @@ export default function Dashboard() {
         <div className="p-6 md:p-8 space-y-8 bg-gray-100 min-h-screen">
             {/* Welcome Section */}
             <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-black">Welcome back, Student!</h1>
+                <h1 className="text-3xl font-bold text-black">Welcome back, {account?.name || "Student"}!</h1>
                 <p className="text-gray-500">Upload your notes and start finding answers instantly</p>
             </div>
 

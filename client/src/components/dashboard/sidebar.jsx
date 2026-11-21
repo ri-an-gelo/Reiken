@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { Brain, Home, FileText, Heart, Settings, LogOut, Menu, X } from "lucide-react";
 import { ServerContext } from "../../context/ServerContext";
+import { useNavigate } from "react-router-dom";
 
 export function DashboardSidebar() {
-    const { account } = useContext(ServerContext);
+    const { account, logout } = useContext(ServerContext);
     const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
     const menuItems = [
         { href: "/dashboard", label: "Home", icon: Home },
@@ -13,21 +15,19 @@ export function DashboardSidebar() {
         { href: "/dashboard/settings", label: "Settings", icon: Settings },
     ];
 
-    // You can replace this logic with your own router-based active state check
     const currentPath = window.location.pathname;
     const isActive = (href) => currentPath === href;
 
     const handleLogout = () => {
-        // Clear user session or token here
-        window.location.href = "/";
-        localStorage.removeItem('user');
+        logout();
+        navigate("/");
     };
 
     useEffect(() => {
-        if(!account) {
-            window.location.href = "/";
+        if (!account) {
+            navigate("/");
         }
-    }, []);
+    }, [account]);
 
     return (
         <>

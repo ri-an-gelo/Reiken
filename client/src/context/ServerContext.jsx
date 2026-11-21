@@ -1,50 +1,62 @@
 import api from "../axios";
-import { createContext, useState } from "react";
+import { createContext, useState, useCallback } from "react";
 
 export const ServerContext = createContext();
 
 export const ServerProvider = ({ children }) => {
-    const [account, setAccount] = useState(JSON.parse(localStorage.getItem('user')) || null);
+    const [account, setAccount] = useState(() => {
+        try {
+            const stored = localStorage.getItem("user");
+            return stored ? JSON.parse(stored) : null;
+        } catch {
+            return null;
+        }
+    });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const signup = async (name, email, password) => {
+    const signup = useCallback(async (name, email, password) => {
+        setLoading(true);
+        setError(null);
         try {
-            setLoading(true);
-            const response = await api.post("/signup", {
-                name,
-                email,
-                password,
-            });
-            console.log(response.data);
-            localStorage.setItem('user', JSON.stringify(response.data));
+            const response = await api.post("/signup", { name, email, password });
+            localStorage.setItem("user", JSON.stringify(response.data));
             setAccount(response.data);
-            setLoading(false);
-        } catch (error) {
-            throw error;
+            return response.data;
+        } catch (err) {
+            const msg = err.response?.data?.error || err.message || "Signup failed";
+            setError(msg);
+            throw new Error(msg);
+        } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const login = async (email, password) => {
+    const login = useCallback(async (email, password) => {
+        setLoading(true);
+        setError(null);
         try {
-            setLoading(true);
-            const response = await api.post("/login", {
-                email,
-                password,
-            });
-            console.log(response.data);
-            localStorage.setItem('user', JSON.stringify(response.data));
+            const response = await api.post("/login", { email, password });
+            localStorage.setItem("user", JSON.stringify(response.data));
             setAccount(response.data);
-            setLoading(false);
-        } catch (error) {
-            throw error;
+            return response.data;
+        } catch (err) {
+            const msg = err.response?.data?.error || err.message || "Login failed";
+            setError(msg);
+            throw new Error(msg);
+        } finally {
             setLoading(false);
         }
-    };
-    
+    }, []);
+
+    const logout = useCallback(() => {
+        localStorage.removeItem("user");
+        setAccount(null);
+    }, []);
+
     return (
-        <ServerContext.Provider value={{ account, signup, loading, login }}>
+        <ServerContext.Provider value={{ account, signup, login, logout, loading, error }}>
             {children}
         </ServerContext.Provider>
     );
-}   
+};

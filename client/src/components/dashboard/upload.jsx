@@ -1,5 +1,5 @@
-import React, { useMemo, useRef, useState } from "react";
-import axios from "axios";
+import React, { useRef, useState } from "react";
+import { ragApi } from "../../axios";
 import { BookOpen, FileText, HelpCircle, Upload } from "lucide-react";
 
 export default function UploadPage() {
@@ -18,10 +18,6 @@ export default function UploadPage() {
     const notesInputRef = useRef(null);
     const questionsInputRef = useRef(null);
 
-    const API_BASE = useMemo(
-        () => (import.meta.env.VITE_API_URL || "http://localhost:3000"),
-        [],
-    );
 
     const handleUploadNotes = async () => {
         if (!notesFile) {
@@ -33,7 +29,7 @@ export default function UploadPage() {
         try {
             const form = new FormData();
             form.append("notes", notesFile);
-            const { data } = await axios.post(`${API_BASE}/rag/upload-notes`, form, {
+            const { data } = await ragApi.post("/upload-notes", form, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             setNotesStatus(`Uploaded: ${data.chunks ?? 0} chunks (source: ${data.source ?? "n/a"})`);
@@ -55,7 +51,7 @@ export default function UploadPage() {
         try {
             const form = new FormData();
             form.append("questions", questionsFile);
-            const { data } = await axios.post(`${API_BASE}/rag/upload-questions`, form, {
+            const { data } = await ragApi.post("/upload-questions", form, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             setQuestionsStatus(`Uploaded: ${data.questions_count ?? 0} questions detected`);
@@ -70,8 +66,8 @@ export default function UploadPage() {
     const handleGenerate = async () => {
         setGenerating(true);
         try {
-            const response = await axios.post(
-                `${API_BASE}/rag/generate`,
+            const response = await ragApi.post(
+                "/generate",
                 { top_k: Number(topK) || 4 },
                 { responseType: "blob" },
             );
