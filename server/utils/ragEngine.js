@@ -1,10 +1,16 @@
 import Database from "better-sqlite3";
 import { fetch } from "undici";
 import dotenv from "dotenv";
+import { tmpdir } from "node:os";
+import path from "node:path";
 
 dotenv.config();
 
-const db = new Database("vectorstore.sqlite");
+const db = new Database(
+    process.env.VERCEL === "1"
+        ? path.join(tmpdir(), "vectorstore.sqlite")
+        : "vectorstore.sqlite",
+);
 db.exec(`
 CREATE TABLE IF NOT EXISTS documents (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

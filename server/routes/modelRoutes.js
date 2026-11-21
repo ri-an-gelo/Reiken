@@ -1,5 +1,7 @@
 import express from "express";
 import multer from "multer";
+import os from "node:os";
+import path from "node:path";
 import {
     uploadNotes,
     uploadQuestions,
@@ -10,7 +12,9 @@ const router = express.Router();
 
 // temp uploads
 const upload = multer({
-    dest: "uploads/tmp/",
+    dest: process.env.VERCEL === "1"
+        ? path.join(os.tmpdir(), "etp-uploads")
+        : "uploads/tmp/",
     limits: { fileSize: 40 * 1024 * 1024 },
 });
 
