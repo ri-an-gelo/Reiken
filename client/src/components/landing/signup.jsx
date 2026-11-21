@@ -1,5 +1,4 @@
 import React, { useContext, useState, useEffect } from "react";
-import axios from "axios";
 import Header from './Header';
 import Footer from './footer';
 import { ServerContext } from "../../context/ServerContext";
@@ -34,7 +33,7 @@ export default function Signup() {
     try {
       await signup(name, email, password);
     } catch (err) {
-      console.log(err);
+      setError(err.message || "Something went wrong. Please try again.");
     }
   };
 

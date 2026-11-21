@@ -1,5 +1,4 @@
-import { useState, useContext, useEffect, use } from "react";
-import axios from "axios";
+import { useState, useContext, useEffect } from "react";
 import Header from './Header';
 import Footer from './footer';
 import { ServerContext } from "../../context/ServerContext";
@@ -23,7 +22,7 @@ export default function Login() {
     try {
       await login(email, password);
     } catch (err) {
-      console.log(err);
+      setError(err.message || "Invalid email or password. Please try again.");
     }
   };
 
